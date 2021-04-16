@@ -1,0 +1,3 @@
+include ':retrofit-jsonapi-converter'
+include ':app'
+rootProject.name = "RetrofitJsonApiConverterExample"
