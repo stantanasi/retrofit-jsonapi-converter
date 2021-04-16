@@ -111,7 +111,7 @@ class JsonApiResponseConverter(
                     when (val annotation = it.annotations.firstOrNull()) {
                         is JsonApiId -> data?.has("id") ?: false
                         is JsonApiAttribute -> attributes?.has(annotation.name) ?: false
-                        is JsonApiRelationships -> {
+                        is JsonApiRelationship -> {
                             if (relationships?.has(annotation.name) == true) {
                                 when (val relationshipData = relationships.optJSONObject(annotation.name)?.opt("data")) {
                                     is JSONObject -> true
@@ -138,7 +138,7 @@ class JsonApiResponseConverter(
                     it to when (val annotation = it.annotations.firstOrNull()) {
                         is JsonApiId -> data!!.optString("id")
                         is JsonApiAttribute -> getAttribute(annotation.name, attributes!!, it.type)
-                        is JsonApiRelationships -> getRelation(annotation.name, relationships!!, included, it.type)
+                        is JsonApiRelationship -> getRelation(annotation.name, relationships!!, included, it.type)
                         else -> {
                             when {
                                 data?.has(it.name) ?: false -> data?.optString(it.name)

@@ -14,4 +14,4 @@ annotation class JsonApiAttribute(val name: String)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiRelationships(val name: String)
+annotation class JsonApiRelationship(val name: String)
