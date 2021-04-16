@@ -1,6 +1,6 @@
 package com.tanasi.jsonapi.converter
 
-import com.tanasi.mangajap.utils.jsonApi.*
+import com.tanasi.jsonapi.*
 import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject

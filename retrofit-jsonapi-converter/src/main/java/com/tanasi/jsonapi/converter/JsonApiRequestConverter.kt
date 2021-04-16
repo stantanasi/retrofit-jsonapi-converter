@@ -1,6 +1,6 @@
 package com.tanasi.jsonapi.converter
 
-import com.tanasi.mangajap.utils.jsonApi.JsonApiResource
+import com.tanasi.jsonapi.JsonApiResource
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Converter
