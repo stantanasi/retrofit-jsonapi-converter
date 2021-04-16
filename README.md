@@ -200,7 +200,7 @@ val response = TestApiService.build().getArticle(id)
 when (response) {
     is JsonApiResponse.Success -> {
         response.headers // okhttp3.Headers
-        response.code // Int = 200
+        response.code // Int = 2xx
 
         response.body.jsonApi?.version // String
         response.body.included // JSONArray
