@@ -30,8 +30,8 @@ dependencies {
 
 ### Setup
 Add the following lines when creating the retrofit instance:
-+ .addCallAdapterFactory(JsonApiCallAdapterFactory.create())
-+ .addConverterFactory(JsonApiConverterFactory.create())
++ **addCallAdapterFactory(JsonApiCallAdapterFactory.create())**
++ **addConverterFactory(JsonApiConverterFactory.create())**
 ```kotlin
 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
@@ -44,7 +44,7 @@ val retrofit = Retrofit.Builder()
 # Usage
 
 ## Create model
-Example json:
+#### JSON
 ```json
 {
   "links": {
@@ -66,7 +66,7 @@ Example json:
   }
 }
 ```
-Corresponding model:
+#### Kotlin
 ```kotlin
 @JsonApiType("articles")
 data class Article(
@@ -79,7 +79,7 @@ data class Article(
 - Use class or data class, whichever you prefer.
 - Use val or var, whichever you prefer.
 
-Default value for property is recommended, in case attribute is not present inside json.
+Property with default value is recommended, in case attribute is not present inside json.
 
 To have custom property name, you must add @JsonApiAttribute and/or @JsonApiRelationship annotations
 ```kotlin
