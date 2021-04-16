@@ -34,11 +34,11 @@ Add the following lines when creating the retrofit instance:
 + **addConverterFactory(JsonApiConverterFactory.create())**
 ```kotlin
 val retrofit = Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .client(client)
-                    .addCallAdapterFactory(JsonApiCallAdapterFactory.create())
-                    .addConverterFactory(JsonApiConverterFactory.create())
-                    .build()
+  .baseUrl(baseUrl)
+  .client(client)
+  .addCallAdapterFactory(JsonApiCallAdapterFactory.create())
+  .addConverterFactory(JsonApiConverterFactory.create())
+  .build()
 ```
 
 # Usage
