@@ -24,7 +24,7 @@ allprojects {
 }
 
 dependencies {
-  implementation 'com.github.StanTanasi:retrofit-jsonapi-converter:LAST_VERSION'
+  implementation 'com.github.stantanasi:retrofit-jsonapi-converter:LAST_VERSION'
 }
 ```
 
