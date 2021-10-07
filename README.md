@@ -124,8 +124,6 @@ suspend fun createArticle(@Body article: Article): JsonApiResponse<Article>
 ```
 
 #### JsonApiParams
-
-Example
 ```kotlin
 JsonApiParams(
     include = listOf("author"),
