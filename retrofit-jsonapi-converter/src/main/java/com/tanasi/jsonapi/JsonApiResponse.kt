@@ -9,7 +9,7 @@ sealed class JsonApiResponse<out T : Any> {
     data class Success<T : Any>(
             val code: Int,
             val body: JsonApiBody<T>,
-            val headers: Headers,
+            val headers: Headers? = null,
     ) : JsonApiResponse<T>()
 
     sealed class Error: JsonApiResponse<Nothing>() {
@@ -17,7 +17,7 @@ sealed class JsonApiResponse<out T : Any> {
         data class ServerError(
                 val code: Int,
                 val body: JsonApiErrorBody,
-                val headers: Headers?,
+                val headers: Headers? = null,
         ) : Error()
 
         data class NetworkError(val error: IOException) : Error()
