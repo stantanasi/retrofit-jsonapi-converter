@@ -1,10 +1,13 @@
 package com.tanasi.jsonapi.adapter
 
 import com.tanasi.jsonapi.JsonApiBody
+import com.tanasi.jsonapi.JsonApiError
+import com.tanasi.jsonapi.JsonApiErrorBody
 import com.tanasi.jsonapi.JsonApiResponse
 import com.tanasi.jsonapi.converter.JsonApiResponseConverter
 import okhttp3.Request
 import okio.Timeout
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.HttpException
@@ -74,11 +77,27 @@ class JsonApiCall<T : Any>(
                     }
                 }
             } else {
+                val rawBody = response.errorBody()?.string() ?: ""
                 try {
-                    val body = JsonApiResponseConverter.convertError(response.errorBody())
+                    val body = JsonApiResponseConverter.convertError(rawBody)
                     JsonApiResponse.Error.ServerError(code, body, headers)
                 } catch (e: Exception) {
-                    JsonApiResponse.Error.UnknownError(e)
+                    JsonApiResponse.Error.ServerError(
+                        code,
+                        JsonApiErrorBody(
+                            rawBody,
+                            listOf(
+                                JsonApiError(
+                                    status = code.toString(),
+                                    title = response.message(),
+                                    detail = e.message,
+                                    meta = JSONObject()
+                                        .put("stackTrace", e.stackTrace.toString()),
+                                ),
+                            ),
+                        ),
+                        headers
+                    )
                 }
             }
         }
@@ -90,7 +109,7 @@ class JsonApiCall<T : Any>(
                 is IOException -> JsonApiResponse.Error.NetworkError(throwable)
                 is HttpException -> {
                     val responseCode = throwable.response()?.code() ?: 520
-                    val body = JsonApiResponseConverter.convertError(throwable.response()?.errorBody())
+                    val body = JsonApiResponseConverter.convertError(throwable.response()?.errorBody()?.string() ?: "")
                     val headers = throwable.response()?.headers()
 
                     JsonApiResponse.Error.ServerError(responseCode, body, headers)

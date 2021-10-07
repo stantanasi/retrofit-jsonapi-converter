@@ -67,8 +67,7 @@ class JsonApiResponseConverter(
     }
 
     companion object {
-        fun convertError(value: ResponseBody?): JsonApiErrorBody {
-            val json = value!!.string()
+        fun convertError(json: String): JsonApiErrorBody {
             val jsonObject = JSONObject(json)
 
             val meta = jsonObject.optJSONObject("meta")
@@ -85,7 +84,7 @@ class JsonApiResponseConverter(
                         errors.optJSONObject(i).optString("code"),
                         errors.optJSONObject(i).optString("title"),
                         errors.optJSONObject(i).optString("detail"),
-                        errors.optJSONObject(i),
+                        errors.optJSONObject(i).optJSONObject("source"),
                         errors.optJSONObject(i).optJSONObject("meta"),
                 ))
             }

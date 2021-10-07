@@ -13,7 +13,7 @@ interface TestApiService {
 
     companion object {
         fun build(): TestApiService {
-            val baseUrl = ""
+            val baseUrl = "https://mangajap-api.herokuapp.com/"
             val client = OkHttpClient.Builder().build()
 
             val retrofit = Retrofit.Builder()
