@@ -46,18 +46,4 @@ abstract class JsonApiResource {
         }
         return result.toString()
     }
-
-    fun updateJson(): String {
-        val result = JSONObject()
-        try {
-            val data = JSONObject()
-            data.put("id", id)
-            data.put("type", (this.javaClass.kotlin.annotations.find { it is JsonApiType } as? JsonApiType)?.name)
-            data.put("attributes", attributes)
-            result.put("data", data)
-        } catch (e: JSONException) {
-            Log.e("JsonApiResource", "update: ", e)
-        }
-        return result.toString()
-    }
 }
