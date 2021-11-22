@@ -13,7 +13,7 @@ sealed class JsonApiResponse<out T : Any> {
         val headers: Headers? = null,
     ) : JsonApiResponse<T>()
 
-    sealed class Error: JsonApiResponse<Nothing>() {
+    sealed class Error : JsonApiResponse<Nothing>() {
 
         data class ServerError(
             val code: Int,

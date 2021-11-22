@@ -1,12 +1,12 @@
 package com.tanasi.jsonapi
 
 class JsonApiParams(
-        include: List<String>? = null,
-        fields: Map<String, List<String>>? = null,
-        sort: List<String>? = null,
-        limit: Int? = null,
-        offset: Int? = null,
-        filter: Map<String, List<String>>? = null
+    include: List<String>? = null,
+    fields: Map<String, List<String>>? = null,
+    sort: List<String>? = null,
+    limit: Int? = null,
+    offset: Int? = null,
+    filter: Map<String, List<String>>? = null,
 ) : Map<String, String> {
 
     private val queryMap: MutableMap<String, String> = mutableMapOf()

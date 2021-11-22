@@ -14,7 +14,11 @@ class JsonApiCallAdapterFactory : CallAdapter.Factory() {
         }
     }
 
-    override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *>? {
+    override fun get(
+        returnType: Type,
+        annotations: Array<Annotation>,
+        retrofit: Retrofit,
+    ): CallAdapter<*, *>? {
         check(returnType is ParameterizedType) { "$returnType must be parameterized. Raw types are not supported" }
 
         val containerType = getParameterUpperBound(0, returnType)

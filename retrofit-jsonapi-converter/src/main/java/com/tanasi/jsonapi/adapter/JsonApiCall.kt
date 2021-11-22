@@ -1,9 +1,9 @@
 package com.tanasi.jsonapi.adapter
 
-import com.tanasi.jsonapi.bodies.JsonApiBody
 import com.tanasi.jsonapi.JsonApiError
-import com.tanasi.jsonapi.bodies.JsonApiErrorBody
 import com.tanasi.jsonapi.JsonApiResponse
+import com.tanasi.jsonapi.bodies.JsonApiBody
+import com.tanasi.jsonapi.bodies.JsonApiErrorBody
 import com.tanasi.jsonapi.converter.JsonApiResponseConverter
 import okhttp3.Request
 import okio.Timeout
@@ -17,12 +17,12 @@ import java.lang.reflect.Type
 
 class JsonApiCall<T : Any>(
     private val call: Call<JsonApiBody<T>>,
-    private val returnType: Type
+    private val returnType: Type,
 ) : Call<JsonApiResponse<T>> {
 
     override fun clone(): Call<JsonApiResponse<T>> = JsonApiCall(
-            call.clone(),
-            returnType
+        call.clone(),
+        returnType
     )
 
     override fun execute(): Response<JsonApiResponse<T>> {
@@ -31,7 +31,10 @@ class JsonApiCall<T : Any>(
 
     override fun enqueue(callback: Callback<JsonApiResponse<T>>) = synchronized(this) {
         call.enqueue(object : Callback<JsonApiBody<T>> {
-            override fun onResponse(call: Call<JsonApiBody<T>>, response: Response<JsonApiBody<T>>) {
+            override fun onResponse(
+                call: Call<JsonApiBody<T>>,
+                response: Response<JsonApiBody<T>>,
+            ) {
                 val jsonApiResponse = ResponseHandler.handleResponse(response, returnType)
                 callback.onResponse(this@JsonApiCall, Response.success(jsonApiResponse))
             }
@@ -59,7 +62,7 @@ class JsonApiCall<T : Any>(
 
         fun <T : Any> handleResponse(
             response: Response<JsonApiBody<T>>,
-            returnType: Type
+            returnType: Type,
         ): JsonApiResponse<T> {
             val code = response.code()
             val headers = response.headers()
@@ -67,7 +70,9 @@ class JsonApiCall<T : Any>(
             return if (response.isSuccessful) {
                 if (returnType == Unit::class.java) {
                     @Suppress("UNCHECKED_CAST")
-                    JsonApiResponse.Success(code, JsonApiBody("", Unit), headers) as JsonApiResponse<T>
+                    JsonApiResponse.Success(code,
+                        JsonApiBody("", Unit),
+                        headers) as JsonApiResponse<T>
                 } else {
                     val body = response.body()
                     if (body != null) {
@@ -103,13 +108,15 @@ class JsonApiCall<T : Any>(
         }
 
         fun <T : Any> handleFailure(
-                throwable: Throwable
+            throwable: Throwable,
         ): JsonApiResponse<T> {
             return when (throwable) {
                 is IOException -> JsonApiResponse.Error.NetworkError(throwable)
                 is HttpException -> {
                     val responseCode = throwable.response()?.code() ?: 520
-                    val body = JsonApiResponseConverter.convertError(throwable.response()?.errorBody()?.string() ?: "")
+                    val body =
+                        JsonApiResponseConverter.convertError(throwable.response()?.errorBody()
+                            ?.string() ?: "")
                     val headers = throwable.response()?.headers()
 
                     JsonApiResponse.Error.ServerError(responseCode, body, headers)
