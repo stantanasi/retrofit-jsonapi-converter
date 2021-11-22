@@ -1,15 +1,15 @@
 package com.tanasi.jsonapi.example.models
 
-import com.tanasi.jsonapi.*
+import com.tanasi.jsonapi.JsonApiResource
+import com.tanasi.jsonapi.JsonApiType
+import kotlin.reflect.KProperty
 
 @JsonApiType("articles")
 data class Article(
-    @JsonApiId override var id: String = "",
-    @JsonApiAttribute("title") var title: String = "",
-    @JsonApiRelationship("author") var writer: Author? = null
-) : JsonApiResource() {
-
-    fun putTitle(title: String) = putAttribute("title", title)
-
-    fun putWriter(writer: Author) = putRelationship("author", writer)
+    var id: String? = null,
+    var title: String = "",
+    var author: People? = null,
+    var comments: List<Comment> = listOf(),
+) : JsonApiResource {
+    override val dirtyProperties: MutableList<KProperty<*>> = mutableListOf()
 }
