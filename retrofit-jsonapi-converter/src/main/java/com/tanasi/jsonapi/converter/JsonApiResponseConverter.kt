@@ -249,7 +249,7 @@ class JsonApiResponseConverter(
                         ))
                     }
                     list
-                } ?: listOf<Any>()
+                } ?: mutableListOf<Any>()
             }
             else -> null
         }
