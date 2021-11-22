@@ -3,7 +3,7 @@ package com.tanasi.jsonapi.converter
 import com.tanasi.jsonapi.*
 import com.tanasi.jsonapi.bodies.JsonApiBody
 import com.tanasi.jsonapi.bodies.JsonApiErrorBody
-import com.tanasi.jsonapi.utils.jsonApiType
+import com.tanasi.jsonapi.extensions.jsonApiType
 import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
