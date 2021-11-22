@@ -1,8 +1,8 @@
 package com.tanasi.jsonapi.adapter
 
-import com.tanasi.jsonapi.JsonApiBody
+import com.tanasi.jsonapi.bodies.JsonApiBody
 import com.tanasi.jsonapi.JsonApiError
-import com.tanasi.jsonapi.JsonApiErrorBody
+import com.tanasi.jsonapi.bodies.JsonApiErrorBody
 import com.tanasi.jsonapi.JsonApiResponse
 import com.tanasi.jsonapi.converter.JsonApiResponseConverter
 import okhttp3.Request
@@ -16,8 +16,8 @@ import java.io.IOException
 import java.lang.reflect.Type
 
 class JsonApiCall<T : Any>(
-        private val call: Call<JsonApiBody<T>>,
-        private val returnType: Type
+    private val call: Call<JsonApiBody<T>>,
+    private val returnType: Type
 ) : Call<JsonApiResponse<T>> {
 
     override fun clone(): Call<JsonApiResponse<T>> = JsonApiCall(
@@ -58,8 +58,8 @@ class JsonApiCall<T : Any>(
     private object ResponseHandler {
 
         fun <T : Any> handleResponse(
-                response: Response<JsonApiBody<T>>,
-                returnType: Type
+            response: Response<JsonApiBody<T>>,
+            returnType: Type
         ): JsonApiResponse<T> {
             val code = response.code()
             val headers = response.headers()

@@ -1,6 +1,6 @@
 package com.tanasi.jsonapi.adapter
 
-import com.tanasi.jsonapi.JsonApiBody
+import com.tanasi.jsonapi.bodies.JsonApiBody
 import com.tanasi.jsonapi.JsonApiResponse
 import retrofit2.Call
 import retrofit2.CallAdapter

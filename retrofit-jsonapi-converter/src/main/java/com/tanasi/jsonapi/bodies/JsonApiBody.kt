@@ -1,4 +1,4 @@
-package com.tanasi.jsonapi
+package com.tanasi.jsonapi.bodies
 
 import org.json.JSONArray
 import org.json.JSONObject
