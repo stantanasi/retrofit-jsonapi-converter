@@ -1,4 +1,4 @@
-package com.tanasi.jsonapi.adapter
+package com.tanasi.jsonapi.callAdapter
 
 import com.tanasi.jsonapi.JsonApiResponse
 import com.tanasi.jsonapi.bodies.JsonApiBody
