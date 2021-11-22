@@ -10,8 +10,8 @@ annotation class JsonApiId
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiAttribute(val name: String)
+annotation class JsonApiAttribute(val name: String, val ignore: Boolean = false)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiRelationship(val name: String)
+annotation class JsonApiRelationship(val name: String, val ignore: Boolean = false)
