@@ -34,4 +34,7 @@ interface MainService {
 
     @POST("articles")
     suspend fun createArticle(@Body article: Article): JsonApiResponse<Article>
+
+    @DELETE("articles/{id}")
+    suspend fun deleteArticle(@Path("id") id: String): JsonApiResponse<Unit>
 }
