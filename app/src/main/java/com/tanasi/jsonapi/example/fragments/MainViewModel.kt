@@ -23,8 +23,9 @@ class MainViewModel : ViewModel() {
         )
         when (response) {
             is JsonApiResponse.Success -> {
-                response.body.data!! // List<Article>
-                response.body.data!!.first().title // JSON:API paints my bikeshed!
+                response.body.data?.forEach {
+                    it.title // String (e.g., JSON:API paints my bikeshed!)
+                }
             }
             else -> TODO()
         }
@@ -39,9 +40,9 @@ class MainViewModel : ViewModel() {
         )
         when (response) {
             is JsonApiResponse.Success -> {
-                response.body.data!! // Article object
-                response.body.data!!.title // JSON:API paints my bikeshed!
-                response.body.data!!.author // Author object or null
+                response.body.data // Article
+                response.body.data?.title // String (e.g., JSON:API paints my bikeshed!)
+                response.body.data?.author // People
             }
             else -> TODO()
         }
@@ -53,7 +54,7 @@ class MainViewModel : ViewModel() {
         )
         when (response) {
             is JsonApiResponse.Success -> {
-                response.body.data!! // Article created
+                response.body.data // Article created
             }
             else -> TODO()
         }
