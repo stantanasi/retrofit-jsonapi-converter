@@ -38,12 +38,7 @@ class MainFragment : Fragment() {
                     "7"
                 )
             )
-        ).apply {
-            dirtyProperties.addAll(listOf(
-                Article::title,
-                Article::author
-            ))
-        })
+        ))
     }
 
 }
