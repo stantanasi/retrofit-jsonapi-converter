@@ -1,20 +1,69 @@
-# Retrofit JsonApi Converter: Android library for Android
+<h1 align="center">Retrofit JSON:API Converter</h1>
 
-Retrofit JsonApi Converter is a Android library for convert JSON:API response to model and model to JSON:API format
+<p align="center">
+  <img src="https://jsonapi.org/images/jsonapi.png" height="100px" />
+  <br />
+  A Retrofit converter for JSON:API specification.
+  <br />
+  <a href="https://jitpack.io/#stantanasi/retrofit-jsonapi-converter">
+    <strong>Implement library »</strong>
+  </a>
+  <br />
+  <br />
+  <a href="https://github.com/stantanasi/retrofit-jsonapi-converter/issues">Report Bug</a>
+  ·
+  <a href="https://github.com/stantanasi/retrofit-jsonapi-converter/issues">Request Feature</a>
+</p>
 
-# Introduction
+<details>
+  <summary>Table of Contents</summary>
 
-### Retrofit
-[Retrofit](https://square.github.io/retrofit/) is a REST Client for Java and Android. It makes it relatively easy to retrieve and upload JSON (or other structured data) via a REST based webservice. In Retrofit you configure which converter is used for the data serialization. Typically for JSON you use GSon, but you can add custom converters to process XML or other protocols. Retrofit uses the OkHttp library for HTTP requests.
+  * [About the project](#about-the-project)
+    * [Built with](#built-with)
+  * [Getting started](#getting-started)
+    * [Prerequisites](#prerequisites)
+    * [Setup](#setup)
+  * [Usage](#usage)
+    * [JSON:API response object](#jsonapi-response-object)
+    * [Setting the models](#setting-the-models)
+      * [Request body](#request-body)
+      * [Multi-type relationship](#multi-type-relationship)
+    * [Define the endpoints](#define-the-endpoints)
+      * [JsonApiParams](#jsonapiparams)
+      * [JsonApiResponse](#jsonapiresponse)
+    * [Make the request](#make-the-request)
+      * [Fetch a collection](#fetch-a-collection)
+      * [Fetch a resource](#fetch-a-resource)
+      * [Create a resource](#create-a-resource)
+  * [Contributing](#contributing)
+  * [Author](#author)
+  * [License](#license)
+</details>
 
-### JSON:API
-[JSON:API](https://jsonapi.org/) is a specification for how a client should request that resources be fetched or modified, and how a server should respond to those requests.
+
+## About the project
+
+Retrofit JSON:API Converter is a Retrofit converter for JSON:API specification
+
+JSON:API is a specification for how a client should request that resources be fetched or modified, and how a server should respond to those requests.
 
 JSON:API is designed to minimize both the number of requests and the amount of data transmitted between clients and servers. This efficiency is achieved without compromising readability, flexibility, or discoverability.
 
-# Getting started
+This is not an official [Square product](https://square.github.io).
 
-### Implement dependency
+### Built with
+
+- [Kotlin](https://kotlinlang.org)
+- [Retrofit](https://square.github.io/retrofit)
+- [JSON:API specification](https://jsonapi.org)
+
+
+## Getting started
+
+### Prerequisites
+
+Inside your root `build.gradle`, add the JitPack maven repository to the list of repositories:
+
 ```gradle
 allprojects {
   repositories {
@@ -22,96 +71,231 @@ allprojects {
     maven { url 'https://jitpack.io' }
   }
 }
+```
 
+Inside your module `build.gradle`, implement library [latest version](https://jitpack.io/#stantanasi/retrofit-jsonapi-converter):
+
+```gradle
 dependencies {
+  ...
   implementation 'com.github.stantanasi:retrofit-jsonapi-converter:LAST_VERSION'
 }
 ```
 
 ### Setup
+
 Add the following lines when creating the retrofit instance:
-+ **addCallAdapterFactory(JsonApiCallAdapterFactory.create())**
-+ **addConverterFactory(JsonApiConverterFactory.create())**
+- **addCallAdapterFactory(JsonApiCallAdapterFactory.create())**
+- **addConverterFactory(JsonApiConverterFactory.create())**
+
 ```kotlin
 val retrofit = Retrofit.Builder()
-  .baseUrl(baseUrl)
-  .client(client)
+  .baseUrl("http://example.com/")
   .addCallAdapterFactory(JsonApiCallAdapterFactory.create())
   .addConverterFactory(JsonApiConverterFactory.create())
   .build()
 ```
 
-# Usage
 
-## Create model
-#### JSON
+## Usage
+
+### JSON:API response object
+
+Let's suppose you have an API that returns the following response:
+
 ```json
 {
-  "links": {
-    "self": "http://example.com/articles/1"
-  },
   "data": {
     "type": "articles",
     "id": "1",
     "attributes": {
       "title": "JSON:API paints my bikeshed!"
     },
+    "links": {
+      "self": "http://example.com/articles/1"
+    },
     "relationships": {
       "author": {
         "links": {
+          "self": "http://example.com/articles/1/relationships/author",
           "related": "http://example.com/articles/1/author"
+        },
+        "data": {
+          "type": "people",
+          "id": "9"
         }
+      },
+      "comments": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/comments",
+          "related": "http://example.com/articles/1/comments"
+        },
+        "data": [
+          {
+            "type": "comments",
+            "id": "5"
+          },
+          {
+            "type": "comments",
+            "id": "12"
+          }
+        ]
       }
     }
-  }
+  },
+  "included": [
+    {
+      "type": "people",
+      "id": "9",
+      "attributes": {
+        "first-name": "Dan",
+        "last-name": "Gebhardt",
+        "twitter": "dgeb"
+      },
+      "links": {
+        "self": "http://example.com/people/9"
+      }
+    },
+    {
+      "type": "comments",
+      "id": "5",
+      "attributes": {
+        "body": "First!"
+      },
+      "relationships": {
+        "author": {
+          "data": {
+            "type": "people",
+            "id": "2"
+          }
+        }
+      },
+      "links": {
+        "self": "http://example.com/comments/5"
+      }
+    },
+    {
+      "type": "comments",
+      "id": "12",
+      "attributes": {
+        "body": "I like XML better"
+      },
+      "relationships": {
+        "author": {
+          "data": {
+            "type": "people",
+            "id": "9"
+          }
+        }
+      },
+      "links": {
+        "self": "http://example.com/comments/12"
+      }
+    }
+  ]
 }
 ```
-#### Kotlin
+
+### Setting the models
+
+You could create the models like this:
+
 ```kotlin
 @JsonApiType("articles")
 data class Article(
-    val id: String = "",
+    var id: String? = null,
     var title: String = "",
-    val author: Author? = null
-) {
-}
+    var author: People? = null,
+    var comments: List<Comment> = listOf(),
+)
+
+@JsonApiType("people")
+data class People(
+    @JsonApiId var id: String,
+    @JsonApiAttribute("first-name") val firstName: String,
+    @JsonApiAttribute("last-name") val lastName: String,
+    @JsonApiAttribute("twitter") val twitter: String = "",
+)
+
+@JsonApiType("comments")
+data class Comment(
+    @JsonApiId val id: String? = null,
+    var body: String = "",
+    var author: People? = null,
+)
 ```
+
 - Use class or data class, whichever you prefer.
 - Use val or var, whichever you prefer.
 
-Property with default value is recommended, in case attribute is not present inside json.
+To have custom property name, you must add @JsonApiAttribute and/or @JsonApiRelationship annotations.
 
-To have custom property name, you must add @JsonApiAttribute and/or @JsonApiRelationship annotations
+Property with default value is recommended, in case attribute is not present inside json response.
+
+Annotations @JsonApiAttribute and @JsonApiRelationship contains an "ignore" property wich ignore fields in request body
+
+#### Request body
+
+If you send your model inside a request, your model will be converte to JSON:API specification with **ALL** attributes and relationships.
+
+If you only need to send specific attributes/relationships inside your request body, you have to:
+- `implements JsonApiResource` to your model
+- Add updated properties inside `dirtyProperties`
+
 ```kotlin
-@JsonApiType("articles")
-data class Article(
-    @JsonApiId val id: String = "",
-    var title: String = "",
-    @JsonApiRelationship("author") var writer: Author? = null
-) {
+@JsonApiType("people")
+data class People(
+    @JsonApiId var id: String,
+    @JsonApiAttribute("first-name") private var _firstName: String = "",
+    @JsonApiAttribute("last-name") private var _lastName: String = "",
+    @JsonApiAttribute("twitter") private var _twitter: String = "",
+) : JsonApiResource {
+
+    var firstName: String = _firstName
+        set(value) {
+            _firstName = value
+            field = value
+            dirtyProperties.add(this::_firstName)
+        }
+    var lastName: String = _lastName
+        set(value) {
+            _lastName = value
+            field = value
+            dirtyProperties.add(this::_lastName)
+        }
+    var twitter: String = _twitter
+        set(value) {
+            _twitter = value
+            field = value
+            dirtyProperties.add(this::_twitter)
+        }
+
+    override val dirtyProperties: MutableList<KProperty<*>> = mutableListOf()
 }
 ```
 
-If you need to send your model in request body, you will have to add: 
-+ model extends JsonApiResource
-+ use function putAttribute and putRelationship, to update resource
+#### Multi-type relationship
+
 ```kotlin
-@JsonApiType("articles")
-data class Article(
-    @JsonApiId override var id: String = "",
-    @JsonApiAttribute("title") var title: String = "",
-    @JsonApiRelationship("author") var writer: Author? = null
-) : JsonApiResource() {
+@JsonApiType("people")
+data class People(
+    ...
+    val books: List<Book> = listOf()
+)
 
-    fun putTitle(title: String) = putAttribute("title", title)
+sealed class Book {
+    @JsonApiType("dictionaries")
+    data class Dictionaries(val id: String, val title: String) : Book()
 
-    fun putWriter(writer: Author) = putRelationship("author", writer)
+    @JsonApiType("graphic-novels")
+    data class GraphicNovel(val id: String, val name: String) : Book()
 }
 ```
 
-## Make a request
+### Define the endpoints
 
-### API Service
+With Retrofit 2, endpoints are defined inside of an interface using special retrofit annotations to encode details about the parameters and request method.
+
 ```kotlin
 @GET("articles")
 suspend fun getArticles(@QueryMap params: JsonApiParams = JsonApiParams()): JsonApiResponse<List<Article>>
@@ -121,146 +305,154 @@ suspend fun getArticle(@Path("id") id: String, @QueryMap params: JsonApiParams =
 
 @POST("articles")
 suspend fun createArticle(@Body article: Article): JsonApiResponse<Article>
+
+@DELETE("articles/{id}")
+suspend fun deleteArticle(@Path("id") id: String): JsonApiResponse<Unit>
 ```
 
 #### JsonApiParams
+
 ```kotlin
 JsonApiParams(
-    include = listOf("author"),
-    fields = mapOf(
-        "articles" to listOf("title", "author"),
-        "people" to listOf("name")
-    ),
-    sort = listOf("title"),
+    include = listOf<String>(),
+    fields = mapOf<String, List<String>>(),
+    sort = listOf<String>(),
     limit = 10,
     offset = 0,
-    filter = mapOf("title" to listOf("JSON:API paints my bikeshed!", "title2"))
+    filter = mapOf<String, List<String>>()
 )
 ```
 
-### Fetch a collection of articles
-```kotlin
-val response = TestApiService.build().getArticles(
-    params = JsonApiParams(
-        include = listOf("author")
-    )
-)
-when (response) {
-    is JsonApiResponse.Success -> {
-        response.body.data!! // List<Article>
-        response.body.data!!.first().title // JSON:API paints my bikeshed!
-    }
-    is JsonApiResponse.Error.ServerError -> TODO()
-    is JsonApiResponse.Error.NetworkError -> TODO()
-    is JsonApiResponse.Error.UnknownError -> TODO()
-}
-```
+#### JsonApiResponse
 
-### Fetch an article
 ```kotlin
-val response = TestApiService.build().getArticle(
-    id = "1",
-    params = JsonApiParams(
-        include = listOf("author")
-    )
-)
-when (response) {
-    is JsonApiResponse.Success -> {
-        response.body.data!! // Article object
-        response.body.data!!.title // JSON:API paints my bikeshed!
-        response.body.data!!.writer // Author object or null
-    }
-    is JsonApiResponse.Error.ServerError -> TODO()
-    is JsonApiResponse.Error.NetworkError -> TODO()
-    is JsonApiResponse.Error.UnknownError -> TODO()
-}
-```
-
-### Create an article
-```kotlin
-article.putTitle(article.title)
-article.putWriter(article.writer!!)
-
-val response = TestApiService.build().createArticle(article)
-when (response) {
-    is JsonApiResponse.Success -> {
-        response.body.data!! // Article created
-    }
-    is JsonApiResponse.Error.ServerError -> TODO()
-    is JsonApiResponse.Error.NetworkError -> TODO()
-    is JsonApiResponse.Error.UnknownError -> TODO()
-}
-```
-
-## Response body
-```kotlin
-val response = TestApiService.build().getArticle(id)
 when (response) {
     is JsonApiResponse.Success -> {
         response.headers // okhttp3.Headers
-        response.code // Int = 2xx
+        response.code // Int (e.g., 2xx)
 
-        response.body.jsonApi?.version // String
+        response.body.jsonApi?.version // String (e.g., "1.0")
         response.body.included // JSONArray
-        response.body.links?.first // String
+        response.body.links?.first // String (e.g., "http://example.com/...")
         response.body.meta // JSONObject
 
-        response.body.raw // String
+        response.body.raw // String (e.g., " {"data":{"type":"articles", ... ")
     }
-    is JsonApiResponse.Error -> TODO()
-}
-```
-
-# Error response
-
-### Example
-```json
-{
-  "jsonapi": { "version": "1.0" },
-  "errors": [
-    {
-      "code":   "400",
-      "source": { "pointer": "/data/attributes/firstName" },
-      "title":  "Value is too short",
-      "detail": "First name must contain at least three characters."
-    },
-    {
-      "code":   "400",
-      "source": { "pointer": "/data/attributes/password" },
-      "title": "Passwords must contain a letter, number, and punctuation character.",
-      "detail": "The password provided is missing a punctuation character."
-    },
-    {
-      "code":   "400",
-      "source": { "pointer": "/data/attributes/password" },
-      "title": "Password and password confirmation do not match."
-    }
-  ]
-}
-```
-
-#### Kotlin
-```kotlin
-val response = TestApiService.build().getArticle(id)
-when (response) {
-    is JsonApiResponse.Success -> TODO()
     is JsonApiResponse.Error.ServerError -> {
-        response.body.errors.first().title // Value is too short
-        response.body.errors.last().source!!.pointer // /data/attributes/password
+        response.body.errors.forEach {
+            it.id // String
+            it.links?.about // String
+            it.status // String
+            it.code // String
+            it.title // String
+            it.detail // String
+            it.source?.pointer // String
+            it.source?.parameter // String
+            it.meta // String
+        }
     }
     is JsonApiResponse.Error.NetworkError -> {
-        response.error // IOException
-        Log.e("TAG", "getArticle: ", response.error)
+        Log.e(
+            TAG,
+            "Network error: ",
+            response.error // IOException
+        )
     }
     is JsonApiResponse.Error.UnknownError -> {
-        response.error // Throwable
-        Log.e("TAG", "getArticle: ", response.error)
+        Log.e(
+            TAG,
+            "Unknown error: ",
+            response.error // Throwable
+        )
     }
 }
 ```
 
-# Author
-Lory-Stan TANASI - [GitHub](https://github.com/stantanasi)
+### Make the request
 
-# Disclaimer
-This is not an official [Square product](https://square.github.io/).
+#### Fetch a collection
+
+```kotlin
+val response = MainService.build().getArticles(
+    params = JsonApiParams(
+        include = listOf("author")
+    )
+)
+when (response) {
+    is JsonApiResponse.Success -> {
+        response.body.data?.forEach {
+            it.title // String (e.g., JSON:API paints my bikeshed!)
+        }
+    }
+    else -> TODO()
+}
+```
+
+#### Fetch a resource
+
+```kotlin
+val response = MainService.build().getArticle(
+    id = id,
+    params = JsonApiParams(
+        include = listOf("author")
+    )
+)
+when (response) {
+    is JsonApiResponse.Success -> {
+        response.body.data // Article
+        response.body.data?.title // String (e.g., JSON:API paints my bikeshed!)
+        response.body.data?.author // People
+    }
+    else -> TODO()
+}
+```
+
+#### Create a resource
+
+```kotlin
+val response = TestApiService.build().createArticle(
+    article = Article(
+        title = "test",
+        author = People(
+            id = "2"
+        ),
+        comments = listOf(
+            Comment(
+                "7"
+            )
+        )
+    )
+)
+when (response) {
+    is JsonApiResponse.Success -> {
+        response.body.data // Article created
+    }
+    else -> TODO()
+}
+```
+
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a pull request
+
+
+## Author
+
+- [Lory-Stan TANASI](https://github.com/stantanasi)
+
+
+## License
+
+This project is licensed under the `Apache-2.0` License - see the [LICENSE](LICENSE) file for details
+
+<p align="center">
+  <br />
+  © 2021 Lory-Stan TANASI. All rights reserved
+</p>
