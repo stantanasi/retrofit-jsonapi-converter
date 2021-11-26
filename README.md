@@ -18,26 +18,26 @@
 <details>
   <summary>Table of Contents</summary>
 
-  * [About the project](#about-the-project)
-    * [Built with](#built-with)
-  * [Getting started](#getting-started)
-    * [Prerequisites](#prerequisites)
-    * [Setup](#setup)
-  * [Usage](#usage)
-    * [JSON:API response object](#jsonapi-response-object)
-    * [Setting the models](#setting-the-models)
-      * [Request body](#request-body)
-      * [Multi-type relationship](#multi-type-relationship)
-    * [Define the endpoints](#define-the-endpoints)
-      * [JsonApiParams](#jsonapiparams)
-      * [JsonApiResponse](#jsonapiresponse)
-    * [Make the request](#make-the-request)
-      * [Fetch a collection](#fetch-a-collection)
-      * [Fetch a resource](#fetch-a-resource)
-      * [Create a resource](#create-a-resource)
-  * [Contributing](#contributing)
-  * [Author](#author)
-  * [License](#license)
+- [About the project](#about-the-project)
+  - [Built with](#built-with)
+- [Getting started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+- [Usage](#usage)
+  - [JSON:API response object](#jsonapi-response-object)
+  - [Setting the models](#setting-the-models)
+    - [Dynamic updates on request body](#dynamic-updates-on-request-body)
+    - [Multi-type relationship](#multi-type-relationship)
+  - [Define the endpoints](#define-the-endpoints)
+    - [JsonApiParams](#jsonapiparams)
+    - [JsonApiResponse](#jsonapiresponse)
+  - [Make the request](#make-the-request)
+    - [Fetch a collection](#fetch-a-collection)
+    - [Fetch a resource](#fetch-a-resource)
+    - [Create a resource](#create-a-resource)
+- [Contributing](#contributing)
+- [Author](#author)
+- [License](#license)
 </details>
 
 
@@ -234,43 +234,56 @@ Property with default value is recommended, in case attribute is not present ins
 
 Annotations @JsonApiAttribute and @JsonApiRelationship contains an "ignore" property wich ignore fields in request body
 
-#### Request body
+#### Dynamic updates on request body
 
-If you send your model inside a request, your model will be converte to JSON:API specification with **ALL** attributes and relationships.
+If you send your model inside a request, your model will be converted to JSON:API specification with **ALL** attributes and relationships.
 
 If you only need to send specific attributes/relationships inside your request body, you have to:
 - `implements JsonApiResource` to your model
 - Add updated properties inside `dirtyProperties`
 
+I recommend using delegate class `JsonApiProperty`. Using this, only properties updated **after instancing** will be sent into request body.
+
 ```kotlin
-@JsonApiType("people")
-data class People(
-    @JsonApiId var id: String,
-    @JsonApiAttribute("first-name") private var _firstName: String = "",
-    @JsonApiAttribute("last-name") private var _lastName: String = "",
-    @JsonApiAttribute("twitter") private var _twitter: String = "",
+@JsonApiType("articles")
+class Article(
+    var id: String? = null,
+    title: String = "",
+    author: People? = null,
+    comments: List<Comment> = listOf(),
 ) : JsonApiResource {
 
-    var firstName: String = _firstName
-        set(value) {
-            _firstName = value
-            field = value
-            dirtyProperties.add(this::_firstName)
-        }
-    var lastName: String = _lastName
-        set(value) {
-            _lastName = value
-            field = value
-            dirtyProperties.add(this::_lastName)
-        }
-    var twitter: String = _twitter
-        set(value) {
-            _twitter = value
-            field = value
-            dirtyProperties.add(this::_twitter)
-        }
+    var title: String by JsonApiProperty(title)
+    var author: People? by JsonApiProperty(author)
+    var comments: List<Comment> by JsonApiProperty(comments)
 
     override val dirtyProperties: MutableList<KProperty<*>> = mutableListOf()
+}
+```
+
+```kotlin
+Article().also {
+    it.title = "test"
+    it.author = People(
+        id = "2"
+    )
+}
+```
+
+```json
+{
+  "type": "articles",
+  "attributes": {
+    "title": "test"
+  },
+  "relationships": {
+    "author": {
+      "data": {
+        "type": "people",
+        "id": "2"
+      }
+    }
+  }
 }
 ```
 
@@ -411,17 +424,12 @@ when (response) {
 
 ```kotlin
 val response = TestApiService.build().createArticle(
-    article = Article(
-        title = "test",
-        author = People(
+    article = Article().also {
+        it.title = "test"
+        it.author = People(
             id = "2"
-        ),
-        comments = listOf(
-            Comment(
-                "7"
-            )
         )
-    )
+    }
 )
 when (response) {
     is JsonApiResponse.Success -> {
