@@ -28,17 +28,12 @@ class MainFragment : Fragment() {
 
         viewModel.getArticles()
         viewModel.getArticle("1")
-        viewModel.createArticle(Article(
-            title = "test",
-            author = People(
+        viewModel.createArticle(Article().also {
+            it.title = "test"
+            it.author = People(
                 id = "2"
-            ),
-            comments = listOf(
-                Comment(
-                    "7"
-                )
             )
-        ))
+        })
     }
 
 }
