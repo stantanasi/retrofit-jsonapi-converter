@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.tanasi.jsonapi.example.R
 import com.tanasi.jsonapi.example.models.Article
-import com.tanasi.jsonapi.example.models.Comment
 import com.tanasi.jsonapi.example.models.People
 
 class MainFragment : Fragment() {

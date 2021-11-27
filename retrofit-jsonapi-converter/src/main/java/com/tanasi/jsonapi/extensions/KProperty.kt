@@ -7,16 +7,18 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.primaryConstructor
 
-fun KProperty<*>.jsonApiAttributeName(c: KClass<*>): String =
-    this::class.primaryConstructor?.parameters
+fun KProperty<*>.jsonApiName(c: KClass<*>): String =
+    c.primaryConstructor?.parameters
         ?.firstOrNull { it.name == this.name }
-        ?.findAnnotation<JsonApiAttribute>()
-        ?.name
-        ?: this.name
-
-fun KProperty<*>.jsonApiRelationshipName(c: KClass<*>): String =
-    this::class.primaryConstructor?.parameters
-        ?.firstOrNull { it.name == this.name }
-        ?.findAnnotation<JsonApiRelationship>()
-        ?.name
+        ?.let {
+            it.findAnnotation<JsonApiAttribute>()
+                ?: it.findAnnotation<JsonApiRelationship>()
+        }
+        ?.let {
+            when (it) {
+                is JsonApiAttribute -> it.name
+                is JsonApiRelationship -> it.name
+                else -> null
+            }
+        }
         ?: this.name
