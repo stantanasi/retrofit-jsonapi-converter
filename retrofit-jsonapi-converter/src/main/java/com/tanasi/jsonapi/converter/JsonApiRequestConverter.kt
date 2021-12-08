@@ -83,7 +83,7 @@ class JsonApiRequestConverter : Converter<Any, RequestBody> {
                     }
                     else -> when {
                         it.prop.isJsonApiAttribute() -> {
-                            attributes.put(it.prop.name, it.prop.call(value) ?: JSONObject.NULL)
+                            attributes.put(it.prop.name, propValue ?: JSONObject.NULL)
                         }
                         it.prop.isJsonApiRelationship() -> {
                             relationships.put(it.prop.name,
