@@ -74,7 +74,7 @@ class JsonApiRequestConverter : Converter<Any, RequestBody> {
                 when {
                     it.param.hasAnnotation<JsonApiAttribute>() -> {
                         val annotation = it.param.findAnnotation<JsonApiAttribute>()!!
-                        attributes.put(annotation.name, propValue)
+                        attributes.put(annotation.name, propValue ?: JSONObject.NULL)
                     }
                     it.param.hasAnnotation<JsonApiRelationship>() -> {
                         val annotation = it.param.findAnnotation<JsonApiRelationship>()!!
@@ -83,7 +83,7 @@ class JsonApiRequestConverter : Converter<Any, RequestBody> {
                     }
                     else -> when {
                         it.prop.isJsonApiAttribute() -> {
-                            attributes.put(it.prop.name, it.prop.call(value))
+                            attributes.put(it.prop.name, it.prop.call(value) ?: JSONObject.NULL)
                         }
                         it.prop.isJsonApiRelationship() -> {
                             relationships.put(it.prop.name,
